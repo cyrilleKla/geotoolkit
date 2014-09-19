@@ -49,7 +49,7 @@ abstract class ReadeableBasicRTreeTest extends AbstractTreeTest {
         final File treeMapperFile = File.createTempFile("test", "mapper", tempDir);
         tEM  = new FileTreeElementMapperTest(crs, treeMapperFile);
         tree = new FileBasicRTree(inOutFile, 3, crs, SplitCase.LINEAR, tEM);
-        
+
         insert();
         tree.close();
         tEM.close();
@@ -57,15 +57,9 @@ abstract class ReadeableBasicRTreeTest extends AbstractTreeTest {
         assertTrue(tEM.isClosed());
         tEM  = new FileTreeElementMapperTest(treeMapperFile, crs);
         tree = new FileBasicRTree(inOutFile, tEM);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        tree.close();
-        tEM.close();
-        assertTrue(tree.isClosed());
-        assertTrue(tEM.isClosed());
+        setTreeFiles((FileTreeElementMapperTest)tEM,(FileBasicRTree)tree);
 
     }
+
+
 }

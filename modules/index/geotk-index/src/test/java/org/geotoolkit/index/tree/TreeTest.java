@@ -17,6 +17,7 @@
 package org.geotoolkit.index.tree;
 
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.index.tree.basic.FileBasicRTree;
 import org.geotoolkit.internal.tree.TreeUtilities;
 
 import java.io.File;
@@ -49,13 +50,27 @@ public abstract class TreeTest {
      * using {@linkplain #deleteTempFiles()} method.
      */
     protected final File tempDir;
+    private FileTreeElementMapperTest tEm;
+    private FileBasicRTree tree;
 
     protected TreeTest() throws IOException {
         tempDir = Files.createTempDirectory("treetest").toFile();
     }
 
+    protected void setTreeFiles(FileTreeElementMapperTest tEm, FileBasicRTree tree){
+        this.tEm = tEm;
+        this.tree = tree;
+    }
+
     @After
     public void deleteTempFiles() throws IOException {
+        if (tree != null) {
+            tree.close();
+        }
+        if (tEm != null){
+            tEm.close();
+        }
+
         Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
@@ -72,6 +87,9 @@ public abstract class TreeTest {
             }
         });
     }
+
+
+
 
     /**
      * Compare 2 lists elements.
