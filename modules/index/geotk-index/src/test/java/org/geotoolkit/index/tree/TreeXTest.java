@@ -61,6 +61,7 @@ public class TreeXTest extends TreeTest {
                 }
             }
         }
+        setTreeFiles(null, (AbstractTree) tree);
     }
 
     /**
