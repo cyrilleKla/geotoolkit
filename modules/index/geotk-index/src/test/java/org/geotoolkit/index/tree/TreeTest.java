@@ -51,13 +51,13 @@ public abstract class TreeTest {
      */
     protected final File tempDir;
     private FileTreeElementMapperTest tEm;
-    private FileBasicRTree tree;
+    private AbstractTree tree;
 
     protected TreeTest() throws IOException {
         tempDir = Files.createTempDirectory("treetest").toFile();
     }
 
-    protected void setTreeFiles(FileTreeElementMapperTest tEm, FileBasicRTree tree){
+    protected void setTreeFiles(FileTreeElementMapperTest tEm, AbstractTree tree){
         this.tEm = tEm;
         this.tree = tree;
     }

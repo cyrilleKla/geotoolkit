@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.geotoolkit.index.tree.AbstractTreeTest;
 import org.geotoolkit.index.tree.FileTreeElementMapperTest;
 import org.geotoolkit.index.tree.StoreIndexException;
+import org.geotoolkit.index.tree.basic.FileBasicRTree;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.assertTrue;
 
@@ -60,5 +61,6 @@ abstract class ReadeableStarRTreeTest extends AbstractTreeTest {
         // open Tree from already filled files.
         tEM  = new FileTreeElementMapperTest(treeMapperFile, crs);
         tree = new FileStarRTree(inOutFile, tEM);
+        setTreeFiles((FileTreeElementMapperTest)tEM,(FileStarRTree)tree);
     }
 }

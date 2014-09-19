@@ -43,6 +43,7 @@ abstract class WritableBasicRTreeTest extends AbstractTreeTest {
         final File treeMapperFile = File.createTempFile("mapper", "test", tempDir);
         tEM  = new FileTreeElementMapperTest(crs, treeMapperFile);
         tree = new FileBasicRTree(inOutFile, 4, crs, SplitCase.LINEAR, tEM);
+        setTreeFiles((FileTreeElementMapperTest)tEM,(FileBasicRTree)tree);
     }
 
 

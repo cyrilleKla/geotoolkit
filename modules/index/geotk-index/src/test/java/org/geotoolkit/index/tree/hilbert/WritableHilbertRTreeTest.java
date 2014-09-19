@@ -43,5 +43,6 @@ abstract class WritableHilbertRTreeTest extends HilbertTest {
 
         tEM = new FileTreeElementMapperTest(crs, treeMapperFile);
         tree = new FileHilbertRTree(inOutFile, 4, 2, crs, tEM);
+        setTreeFiles((FileTreeElementMapperTest)tEM, (FileHilbertRTree)tree);
     }
 }
