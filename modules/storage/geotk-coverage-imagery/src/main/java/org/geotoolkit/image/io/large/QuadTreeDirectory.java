@@ -259,7 +259,7 @@ public class QuadTreeDirectory {
     @Override
     protected void finalize() throws Throwable {
         if (isDeleteOnExit) {
-            FileUtilities.deleteDirectory(Paths.get(treeRootPath));
+            FileUtilities.deleteDirectory(new File(treeRootPath));
         }
         super.finalize();
     }
