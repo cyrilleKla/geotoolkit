@@ -279,28 +279,37 @@ public class TreeXTest {
         if (tree != null) {
             tree.close(); 
         }
-//        if (tEm != null){
-//            tEm.close();
-//        }
+        if (tXEM != null){
+            tXEM.close();
+        }
 
-        Thread.sleep(50);
-        Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                // need for file deletion on windows platform
-                System.gc();
-                Files.delete(dir);
-                return super.postVisitDirectory(dir, exc);
-            }
+        boolean close = false;
+        int n = 0;
+        while ((!close)&&(n++ < 5)) {
+            try {
+                Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        // need for file deletion on windows platform
+                        System.gc();
+                        Files.delete(dir);
+                        return super.postVisitDirectory(dir, exc);
+                    }
 
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                // need for file deletion on windows platform
-                System.gc();
-                Files.delete(file);
-                return super.visitFile(file, attrs);
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        // need for file deletion on windows platform
+                        System.gc();
+                        Files.delete(file);
+                        return super.visitFile(file, attrs);
+                    }
+                });
+                close = true;
+            } catch (Exception e) {
+                Thread.sleep(50);
             }
-        });
+        }
+            
     }
 }
 
