@@ -27,8 +27,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.sis.util.ArgumentChecks;
+import org.junit.After;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,17 +48,17 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Rémi Maréchal (Geomatys).
  */
-public class TreeXTest extends TreeTest {
+public class TreeXTest {
 
     private Tree tree ;
-//    protected final File tempDir;
+    protected final File tempDir;
     private TreeXElementMapperTest tXEM ;
     private final File treeFile;
 
     private static final CoordinateReferenceSystem CRS_TEST = PredefinedCRS.CARTESIAN_3D;
 
     public TreeXTest() throws StoreIndexException, IOException {
-//        tempDir = Files.createTempDirectory("treeXtest").toFile();
+        tempDir = Files.createTempDirectory("treeXtest").toFile();
         treeFile = File.createTempFile("TreeX", "test", tempDir);
         tXEM = new TreeXElementMapperTest();
         tree = new FileStarRTree(treeFile, 4, CRS_TEST, tXEM);
@@ -64,7 +71,7 @@ public class TreeXTest extends TreeTest {
                 }
             }
         }
-        setTreeFiles(null, (AbstractTree) tree);
+//        setTreeFiles(null, (AbstractTree) tree);
     }
 
     /**
@@ -85,7 +92,7 @@ public class TreeXTest extends TreeTest {
     @Test
     public void readCRSTest() throws IOException, ClassNotFoundException {
         assertEquals("Read CRS must be the same as the tree one.", CRS_TEST, TreeAccessFile.getTreeCRS(treeFile));
-        this.tree = null;
+//        this.tree = null;
     }
 
     /**
@@ -105,7 +112,7 @@ public class TreeXTest extends TreeTest {
         geTemp.setEnvelope(tree.getRoot().getBoundary());
         tabResult = TreeX.search(tree, geTemp, SpatialFilterType.CONTAINS);
         assertTrue(tabResult.length == 0);
-        this.tree = null;
+//        this.tree = null;
     }
 
     /**
@@ -131,7 +138,7 @@ public class TreeXTest extends TreeTest {
         geTemp.setEnvelope(tree.getRoot().getBoundary());
         tabResult = TreeX.search(tree, geTemp, SpatialFilterType.DISJOINT);
         assertTrue(tabResult.length == 0);
-        this.tree = null;
+//        this.tree = null;
     }
 
     /**
@@ -155,7 +162,7 @@ public class TreeXTest extends TreeTest {
         geTemp.setEnvelope(-10, 97, -10, 210, 104, 210);
         tabresult = TreeX.search(tree, geTemp, SpatialFilterType.WITHIN);
         assertTrue(tabresult.length == 0);
-        this.tree = null;
+//        this.tree = null;
     }
 
     /**
@@ -181,7 +188,7 @@ public class TreeXTest extends TreeTest {
         geTemp.setEnvelope(144, -10, -10, 156, 210, 210);
         tabresult = TreeX.search(tree, geTemp, SpatialFilterType.TOUCHES);
         assertTrue(tabresult.length == 0);
-        this.tree = null;
+//        this.tree = null;
     }
 
     /**
@@ -201,7 +208,7 @@ public class TreeXTest extends TreeTest {
         geTemp.setEnvelope(tree.getRoot().getBoundary());
         tabresult = TreeX.search(tree, geTemp, SpatialFilterType.EQUALS);
         assertTrue(tabresult.length == 0);
-        this.tree = null;
+//        this.tree = null;
     }
 
     /**
@@ -230,71 +237,71 @@ public class TreeXTest extends TreeTest {
         geTemp.setEnvelope(145, -10, -10, 165, 210, 210);
         tabresult = TreeX.search(tree, geTemp, SpatialFilterType.OVERLAPS);
         assertTrue(tabresult.length == 0);
-        this.tree = null;
+//        this.tree = null;
     }
     
-//    /**
-//     * Compare 2 lists elements.
-//     *
-//     * <blockquote><font size=-1> <strong> NOTE: return {@code true} if listA
-//     * and listB are empty. </strong> </font></blockquote>
-//     *
-//     * @param listA
-//     * @param listB
-//     * @throws IllegalArgumentException if listA or ListB is null.
-//     * @return true if listA contains same elements from listB.
-//     */
-//    private boolean compareList(final List listA, final List listB) {
-//        ArgumentChecks.ensureNonNull("compareList : listA", listA);
-//        ArgumentChecks.ensureNonNull("compareList : listB", listB);
-//
-//        if (listA.isEmpty() && listB.isEmpty()) return true;
-//        if (listA.size() != listB.size()) return false;
-//
-//        boolean shapequals = false;
-//        for (Object objA : listA) {
-//            final Envelope shs = (Envelope) objA;
-//            for (Object objB : listB) {
-//                final Envelope shr = (Envelope) objB;
-//                if (new GeneralEnvelope(shs).equals(shr, 1E-9, false)) {
-//                    shapequals = true;
-//                    break;
-//                }
-//            }
-//            if (!shapequals) return false;
-//            shapequals = false;
-//        }
-//        return true;
-//    }
+    /**
+     * Compare 2 lists elements.
+     *
+     * <blockquote><font size=-1> <strong> NOTE: return {@code true} if listA
+     * and listB are empty. </strong> </font></blockquote>
+     *
+     * @param listA
+     * @param listB
+     * @throws IllegalArgumentException if listA or ListB is null.
+     * @return true if listA contains same elements from listB.
+     */
+    private boolean compareList(final List listA, final List listB) {
+        ArgumentChecks.ensureNonNull("compareList : listA", listA);
+        ArgumentChecks.ensureNonNull("compareList : listB", listB);
+
+        if (listA.isEmpty() && listB.isEmpty()) return true;
+        if (listA.size() != listB.size()) return false;
+
+        boolean shapequals = false;
+        for (Object objA : listA) {
+            final Envelope shs = (Envelope) objA;
+            for (Object objB : listB) {
+                final Envelope shr = (Envelope) objB;
+                if (new GeneralEnvelope(shs).equals(shr, 1E-9, false)) {
+                    shapequals = true;
+                    break;
+                }
+            }
+            if (!shapequals) return false;
+            shapequals = false;
+        }
+        return true;
+    }
     
-//    @AfterClass
-//    public static void deleteTempFiles(Tree tree, File tempDir) throws IOException {
-//        if (tree != null) {
-//            tree.close(); 
+    @After
+    public void deleteTempFiles() throws IOException {
+        if (tree != null) {
+            tree.close(); 
+        }
+//        if (tEm != null){
+//            tEm.close();
 //        }
-////        if (tEm != null){
-////            tEm.close();
-////        }
-//
-//        
-//        Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitor<Path>() {
-//            @Override
-//            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-//                // need for file deletion on windows platform
-//                System.gc();
-//                Files.delete(dir);
-//                return super.postVisitDirectory(dir, exc);
-//            }
-//
-//            @Override
-//            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-//                // need for file deletion on windows platform
-//                System.gc();
-//                Files.delete(file);
-//                return super.visitFile(file, attrs);
-//            }
-//        });
-//    }
+
+        
+        Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                // need for file deletion on windows platform
+                System.gc();
+                Files.delete(dir);
+                return super.postVisitDirectory(dir, exc);
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                // need for file deletion on windows platform
+                System.gc();
+                Files.delete(file);
+                return super.visitFile(file, attrs);
+            }
+        });
+    }
 }
 
 /**
