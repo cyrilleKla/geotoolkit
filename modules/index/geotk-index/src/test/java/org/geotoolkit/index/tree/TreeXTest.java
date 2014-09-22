@@ -275,7 +275,7 @@ public class TreeXTest {
     }
     
     @After
-    public void deleteTempFiles() throws IOException {
+    public void deleteTempFiles() throws IOException, InterruptedException {
         if (tree != null) {
             tree.close(); 
         }
@@ -283,7 +283,7 @@ public class TreeXTest {
 //            tEm.close();
 //        }
 
-        
+        Thread.sleep(50);
         Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
