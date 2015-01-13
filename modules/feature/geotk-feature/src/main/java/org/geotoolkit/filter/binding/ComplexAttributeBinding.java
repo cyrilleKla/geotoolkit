@@ -18,23 +18,20 @@ package org.geotoolkit.filter.binding;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
-import org.geotoolkit.feature.DefaultAssociation;
 import static org.geotoolkit.filter.binding.AttributeBinding.stripPrefix;
-import org.geotoolkit.feature.ComplexAttribute;
-import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.Property;
-import org.geotoolkit.feature.simple.SimpleFeature;
+import org.opengis.feature.Feature;
+import org.opengis.feature.Property;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ComplexAttributeBinding extends AbstractBinding<ComplexAttribute>{
+public class ComplexAttributeBinding extends AbstractBinding<Feature>{
     private static final Pattern ID_PATTERN       = Pattern.compile("@(\\w+:)?id");
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("(\\w+:)?(.+)");
 
     public ComplexAttributeBinding() {
-        super(ComplexAttribute.class, 20);
+        super(Feature.class, 20);
     }
     
     @Override
@@ -45,7 +42,7 @@ public class ComplexAttributeBinding extends AbstractBinding<ComplexAttribute>{
     }
 
     @Override
-    public <T> T get(ComplexAttribute candidate, String xpath, Class<T> target) throws IllegalArgumentException {
+    public <T> T get(Feature candidate, String xpath, Class<T> target) throws IllegalArgumentException {
         if(candidate==null) return null;
         xpath = stripPrefix(xpath);
         if(candidate instanceof Feature && ID_PATTERN.matcher(xpath).matches()){
@@ -73,11 +70,8 @@ public class ComplexAttributeBinding extends AbstractBinding<ComplexAttribute>{
     }
 
     @Override
-    public void set(ComplexAttribute candidate, String xpath, Object value) throws IllegalArgumentException {
+    public void set(Feature candidate, String xpath, Object value) throws IllegalArgumentException {
         xpath = stripPrefix(xpath);
-        if(candidate instanceof SimpleFeature) {
-            ((SimpleFeature) candidate).setAttribute(xpath, value);
-        }
         candidate.getProperty(xpath).setValue(value);
     }
 

@@ -17,7 +17,6 @@
  */
 package org.geotoolkit.filter.binaryspatial;
 
-import org.geotoolkit.feature.Feature;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.io.Serializable;
@@ -42,7 +41,10 @@ import org.opengis.referencing.operation.TransformException;
 
 import static org.apache.sis.util.ArgumentChecks.*;
 import org.apache.sis.util.ObjectConverters;
+import org.geotoolkit.feature.FeatureUtilities;
 import org.opengis.coverage.Coverage;
+import org.opengis.feature.Attribute;
+import org.opengis.feature.Feature;
 
 /**
  * Immutable abstract binary spatial operator.
@@ -100,7 +102,8 @@ public abstract class AbstractBinarySpatialOperator<E extends Expression,F exten
     protected static Geometry toGeometry(final Object object, Expression exp){
         Object value;
         if ((exp instanceof PropertyName) && object instanceof Feature && ((PropertyName)exp).getPropertyName().isEmpty()) {
-            value = ((Feature)object).getDefaultGeometryProperty().getValue();
+            Attribute att = FeatureUtilities.getDefaultGeometryProperty((Feature)object);
+            value = (att == null) ? null : att.getValue();
         } else {
             value = exp.evaluate(object);
         }

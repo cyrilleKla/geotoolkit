@@ -33,12 +33,15 @@ import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.ObjectConverters;
 import org.apache.sis.util.logging.Logging;
 import org.opengis.coverage.grid.GridCoverage;
-import org.geotoolkit.feature.simple.SimpleFeature;
-import org.geotoolkit.feature.simple.SimpleFeatureType;
-import org.geotoolkit.feature.type.*;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.parameter.*;
 import org.apache.sis.util.UnconvertibleObjectException;
+import org.geotoolkit.filter.identity.DefaultFeatureId;
+import org.opengis.feature.Attribute;
+import org.opengis.feature.AttributeType;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureType;
+import org.opengis.feature.PropertyType;
 
 /**
  *
@@ -49,7 +52,55 @@ import org.apache.sis.util.UnconvertibleObjectException;
  * @module pending
  */
 public final class FeatureUtilities {
-
+    
+    /**
+     * Get the default geometry attribute name, or the first geometric attribute
+     * if there is no defined geometry attribute. null otherwise.
+     * 
+     * @param feature not null
+     * @return Attribute can be null if there is no geometric attribute
+     */
+    public static Attribute getDefaultGeometryProperty(Feature feature){
+        
+        final AttributeType geomAttType = FeatureTypeUtilities.getDefaultGeometryProperty(feature.getType());
+                
+        if(geomAttType==null){
+            //no default geometry attribute
+            return null;
+        }
+        
+        return (Attribute)feature.getProperty(geomAttType.getName().toString());
+    }
+    
+    /**
+     * Get feature identifier.
+     * 
+     * @param feature not null
+     * @return Object identifier
+     */
+    public static Identifier getId(Feature feature){
+        final Object obj = feature.getPropertyValue(FeatureTypeUtilities.ATT_ID);
+        if(obj instanceof Identifier){
+            return (Identifier) obj;
+        }else{
+            return new DefaultFeatureId(String.valueOf(obj));
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * Key used if properties to store a version manager for the object.
      */

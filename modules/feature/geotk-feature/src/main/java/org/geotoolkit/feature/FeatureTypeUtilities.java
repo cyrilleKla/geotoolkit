@@ -74,8 +74,14 @@ import java.util.Objects;
 import org.apache.sis.util.Classes;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.filter.function.string.LengthFunction;
+import org.opengis.feature.Attribute;
+import org.opengis.feature.AttributeType;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureType;
+import org.opengis.feature.PropertyType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Function;
+import org.opengis.util.GenericName;
 
 /**
  * Utility methods for working against the FeatureType interface.
@@ -96,6 +102,83 @@ import org.opengis.filter.expression.Function;
  */
 public final class FeatureTypeUtilities {
 
+    public static final String ATT_ID = "@id";
+    public static final String CHAR_DEFAULT_GEOMETRY = "geometry";
+    public static final String CHAR_CRS = "crs";
+    
+    /**
+     * Get the default geometry attribute, or the first geometric attribute
+     * if there is no defined geometry attribute. null otherwise.
+     * 
+     * @param type not null
+     * @return AttributeType default geometry attribute type
+     */
+    public static AttributeType getDefaultGeometryProperty(FeatureType type){
+        
+        AttributeType geomAtt = null;
+        
+        for(PropertyType pt : type.getProperties(true)){
+            if(pt instanceof AttributeType){
+                final AttributeType at = (AttributeType) pt;
+                final Map<String,AttributeType<?>> chars = at.characteristics();
+                final AttributeType<?> att = chars.get(CHAR_DEFAULT_GEOMETRY);
+                if(att!=null) {
+                    //found the default geometry attribute
+                    geomAtt = at;
+                    break;
+                }else if(geomAtt==null && at.getValueClass().isAssignableFrom(Geometry.class)){
+                    //keep this attribute name, it is the first geometry type found
+                    geomAtt = at;
+                }
+            }
+        }
+        
+        return geomAtt;
+    }
+    
+    /**
+     * Get attribute CRS information if present.
+     * 
+     * @param at not null
+     * @return CoordinateReferenceSystem or null if not found
+     */
+    public static CoordinateReferenceSystem getCoordinateReferenceSystem(AttributeType at){
+        final Map<String,AttributeType<?>> chars = at.characteristics();
+        final AttributeType<?> att = chars.get(CHAR_CRS);
+        return (att==null) ? null : (CoordinateReferenceSystem)att.getDefaultValue();
+    }
+    
+    /**
+     * Get identifier attribute type.
+     * 
+     * @param type not null
+     * @return AttributeType
+     */
+    public static AttributeType getIdType(FeatureType type){
+        return (AttributeType) type.getProperty(ATT_ID);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /** the default namespace for feature types */
     //public static final URI = GMLSchema.NAMESPACE;
     public static final URI DEFAULT_NAMESPACE;

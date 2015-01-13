@@ -19,8 +19,8 @@ package org.geotoolkit.filter.binding;
 
 import java.util.Collections;
 import java.util.Iterator;
+import org.apache.sis.util.iso.Names;
 
-import org.geotoolkit.feature.type.DefaultName;
 
 import org.jaxen.FunctionCallException;
 import org.jaxen.JaxenConstants;
@@ -37,14 +37,14 @@ import org.jaxen.util.FollowingSiblingAxisIterator;
 import org.jaxen.util.PrecedingAxisIterator;
 import org.jaxen.util.PrecedingSiblingAxisIterator;
 import org.jaxen.util.SelfAxisIterator;
+import org.opengis.feature.Attribute;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureType;
+import org.opengis.feature.Property;
+import org.opengis.feature.PropertyType;
 
-import org.geotoolkit.feature.Attribute;
-import org.geotoolkit.feature.ComplexAttribute;
-import org.geotoolkit.feature.Property;
-import org.geotoolkit.feature.type.ComplexType;
-import org.geotoolkit.feature.type.PropertyDescriptor;
-import org.geotoolkit.feature.type.PropertyType;
 import org.opengis.filter.identity.Identifier;
+import org.opengis.util.GenericName;
 
 /**
  * xpath navigator for features.
@@ -63,13 +63,10 @@ final class JaxenFeatureNavigator implements Navigator{
     public String getElementNamespaceUri(final Object o) {
         if(o instanceof Property){
             final Property candidate = (Property) o;
-            return candidate.getName().getNamespaceURI();
-        }else if(o instanceof PropertyDescriptor){
-            final PropertyDescriptor candidate = (PropertyDescriptor) o;
-            return candidate.getName().getNamespaceURI();
+            return candidate.getName().scope().name().toString();
         }else if(o instanceof PropertyType){
             final PropertyType candidate = (PropertyType) o;
-            return candidate.getName().getNamespaceURI();
+            return candidate.getName().scope().name().toString();
         }
         return null;
     }
@@ -78,13 +75,10 @@ final class JaxenFeatureNavigator implements Navigator{
     public String getElementName(final Object o) {
         if(o instanceof Property){
             final Property candidate = (Property) o;
-            return candidate.getName().getLocalPart();
-        }else if(o instanceof PropertyDescriptor){
-            final PropertyDescriptor candidate = (PropertyDescriptor) o;
-            return candidate.getName().getLocalPart();
+            return candidate.getName().tip().toString();
         }else if(o instanceof PropertyType){
             final PropertyType candidate = (PropertyType) o;
-            return candidate.getName().getLocalPart();
+            return candidate.getName().tip().toString();
         }
         return null;
     }
@@ -93,13 +87,10 @@ final class JaxenFeatureNavigator implements Navigator{
     public String getElementQName(final Object o) {
         if(o instanceof Property){
             final Property candidate = (Property) o;
-            return DefaultName.toJCRExtendedForm(candidate.getName());
-        }else if(o instanceof PropertyDescriptor){
-            final PropertyDescriptor candidate = (PropertyDescriptor) o;
-            return DefaultName.toJCRExtendedForm(candidate.getName());
+            return Names.toExpandedString(candidate.getName());
         }else if(o instanceof PropertyType){
             final PropertyType candidate = (PropertyType) o;
-            return DefaultName.toJCRExtendedForm(candidate.getName());
+            return Names.toExpandedString(candidate.getName());
         }
         return null;
     }
@@ -124,12 +115,12 @@ final class JaxenFeatureNavigator implements Navigator{
 
     @Override
     public boolean isDocument(final Object o) {
-        return o instanceof ComplexAttribute || o instanceof ComplexType;
+        return o instanceof Feature || o instanceof FeatureType;
     }
 
     @Override
     public boolean isElement(final Object o) {
-        return o instanceof Property || o instanceof PropertyType || o instanceof PropertyDescriptor;
+        return o instanceof Property || o instanceof PropertyType;
     }
 
     @Override
@@ -168,12 +159,9 @@ final class JaxenFeatureNavigator implements Navigator{
             final Property candidate = (Property) o;
             final Object value = candidate.getValue();
             return (value==null)? EMPTY : value.toString();
-        }else if(o instanceof PropertyDescriptor){
-            final PropertyDescriptor candidate = (PropertyDescriptor) o;
-            return DefaultName.toJCRExtendedForm(candidate.getName());
         }else if(o instanceof PropertyType){
             final PropertyType candidate = (PropertyType) o;
-            return DefaultName.toJCRExtendedForm(candidate.getName());
+            return Names.toExpandedString(candidate.getName());
         }
         return null;
     }
@@ -223,23 +211,14 @@ final class JaxenFeatureNavigator implements Navigator{
 
     @Override
     public Iterator getChildAxisIterator(final Object o) throws UnsupportedAxisException {
-        if(o instanceof ComplexAttribute){
-            final ComplexAttribute candidate = (ComplexAttribute) o;
+        if(o instanceof Feature){
+            final Feature candidate = (Feature) o;
             return candidate.getProperties().iterator();
-        }else if(o instanceof PropertyDescriptor){
-            final PropertyDescriptor ca = (PropertyDescriptor) o;
-            final PropertyType type = ca.getType();
-            if(type instanceof ComplexType){
-                final ComplexType ct = (ComplexType) type;
-                return ct.getDescriptors().iterator();
-            }else{
-                return JaxenConstants.EMPTY_ITERATOR;
-            }
         }else if(o instanceof PropertyType){
             final PropertyType type = (PropertyType) o;
-            if(type instanceof ComplexType){
-                final ComplexType ct = (ComplexType) type;
-                return ct.getDescriptors().iterator();
+            if(type instanceof FeatureType){
+                final FeatureType ct = (FeatureType) type;
+                return ct.getProperties(true).iterator();
             }else{
                 return JaxenConstants.EMPTY_ITERATOR;
             }
@@ -287,7 +266,7 @@ final class JaxenFeatureNavigator implements Navigator{
     public Iterator getAttributeAxisIterator(final Object o) throws UnsupportedAxisException {
         if(o instanceof Attribute){
             final Attribute att = (Attribute) o;
-            final Identifier id = att.getIdentifier();
+            final GenericName id = att.getName();
             if(id != null){
                 return Collections.singleton(id).iterator();
             }
@@ -328,9 +307,7 @@ final class JaxenFeatureNavigator implements Navigator{
 
     @Override
     public Object getDocumentNode(final Object o) {
-        if(o instanceof ComplexAttribute){
-            return o;
-        }else if(o instanceof PropertyDescriptor){
+        if(o instanceof Feature){
             return o;
         }else if(o instanceof PropertyType){
             return o;

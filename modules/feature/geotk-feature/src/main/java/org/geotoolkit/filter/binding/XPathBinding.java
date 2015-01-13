@@ -25,9 +25,10 @@ import java.util.logging.Logger;
 import org.apache.sis.util.ObjectConverters;
 
 import org.jaxen.JaxenException;
-import org.geotoolkit.feature.ComplexAttribute;
-import org.geotoolkit.feature.Property;
-import org.geotoolkit.feature.type.ComplexType;
+import org.opengis.feature.Attribute;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureType;
+import org.opengis.feature.Property;
 
 
 /**
@@ -38,15 +39,15 @@ import org.geotoolkit.feature.type.ComplexType;
  */
 public class XPathBinding<C> extends AbstractBinding<C> {
 
-    public static class CAXPath extends XPathBinding<ComplexAttribute>{
+    public static class CAXPath extends XPathBinding<Feature>{
         public CAXPath() {
-            super(ComplexAttribute.class, 19);
+            super(Feature.class, 19);
         }        
     }
     
-    public static class CTXPath extends XPathBinding<ComplexType>{
+    public static class CTXPath extends XPathBinding<FeatureType>{
         public CTXPath() {
-            super(ComplexType.class, 9);
+            super(FeatureType.class, 9);
         }        
     }
     
@@ -121,8 +122,8 @@ public class XPathBinding<C> extends AbstractBinding<C> {
     public void set(final C candidate, final String xpath, final Object value) throws IllegalArgumentException {
         final Object obj = get(candidate,xpath,Property.class);
 
-        if(obj instanceof Property){
-            final Property prop = (Property)obj;
+        if(obj instanceof Attribute){
+            final Attribute prop = (Attribute)obj;
             prop.setValue(value);
         }else{
             throw new IllegalArgumentException("Can not set value for xpath : " + xpath);
