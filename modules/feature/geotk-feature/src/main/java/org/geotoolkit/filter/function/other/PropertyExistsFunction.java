@@ -21,9 +21,8 @@ import java.util.Objects;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.geotoolkit.filter.function.AbstractFunction;
-import org.geotoolkit.feature.simple.SimpleFeature;
-import org.geotoolkit.feature.type.AttributeDescriptor;
-import org.geotoolkit.feature.type.FeatureType;
+import org.opengis.feature.Feature;
+import org.opengis.feature.PropertyType;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
@@ -64,11 +63,10 @@ public class PropertyExistsFunction extends AbstractFunction {
      *         name passed as this function argument, {@link Boolean#FALSE}
      *         otherwise.
      */
-    public Object evaluate(final SimpleFeature feature) {
-        String propName = getPropertyName();
-        AttributeDescriptor attributeType = feature.getFeatureType().getDescriptor(propName);
-
-        return attributeType != null;
+    public Object evaluate(final Feature feature) {
+        final String propName = getPropertyName();
+        final PropertyType attType = feature.getType().getProperty(propName);
+        return attType != null;
     }
 
     /**
@@ -79,8 +77,8 @@ public class PropertyExistsFunction extends AbstractFunction {
      */
     @Override
     public Object evaluate(final Object bean) {
-        if (bean instanceof SimpleFeature) {
-            return evaluate((SimpleFeature) bean);
+        if (bean instanceof Feature) {
+            return evaluate((Feature) bean);
         }
 
         final String propName = getPropertyName();

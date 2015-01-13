@@ -35,11 +35,11 @@ import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.referencing.CommonCRS;
+import org.geotoolkit.feature.FeatureTypeUtilities;
 import org.geotoolkit.util.StringUtilities;
+import org.opengis.feature.AttributeType;
+import org.opengis.feature.Feature;
 
-import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.GeometryDescriptor;
-import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
@@ -116,12 +116,11 @@ public class DefaultBBox extends AbstractBinarySpatialOperator<PropertyName,Defa
             final Feature att = (Feature) base;
             final String propertyName = left.getPropertyName();
             if (propertyName.isEmpty()) {
-                crs = att.getType().getCoordinateReferenceSystem();
+                final AttributeType attGeom = FeatureTypeUtilities.getDefaultGeometryProperty(att.getType());
+                crs = FeatureTypeUtilities.getCoordinateReferenceSystem(attGeom);
             } else {
-                final PropertyDescriptor desc = att.getType().getDescriptor(propertyName);
-                if(desc instanceof GeometryDescriptor){
-                    crs = ((GeometryDescriptor)desc).getCoordinateReferenceSystem();
-                }
+                final AttributeType attGeom = (AttributeType) att.getType().getProperty(propertyName);
+                crs = FeatureTypeUtilities.getCoordinateReferenceSystem(attGeom);
             }
         }
 
